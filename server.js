@@ -2,7 +2,15 @@ require("dotenv").config();
 const connectDB = require("./src/config/db")
 
 const app = require("./src/app")
-connectDB();
-app.listen(3001,()=>{
-    console.log("Server running on port 3001")
-})
+
+const startServer = async () => {
+    const isDbConnected = await connectDB();
+    app.listen(3001,()=>{
+        console.log("Server running on port 3001")
+        if (!isDbConnected) {
+            console.log("Running without database connection. Database-dependent routes will fail until MongoDB is reachable.");
+        }
+    })
+}
+
+startServer();

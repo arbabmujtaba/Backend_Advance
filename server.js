@@ -1,10 +1,10 @@
 require("dotenv").config();
-const connectDB = require("./src/config/db")
+const ConnecttoDB = require("./src/config/db")
 
 const app = require("./src/app")
 
 const startServer = async () => {
-    const isDbConnected = await connectDB();
+    const isDbConnected = await ConnecttoDB();
     app.listen(3001,()=>{
         console.log("Server running on port 3001")
         if (!isDbConnected) {
@@ -12,5 +12,4 @@ const startServer = async () => {
         }
     })
 }
-
 startServer();

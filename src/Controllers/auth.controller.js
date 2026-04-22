@@ -1,70 +1,57 @@
-const userModel = require("../models/user.model");
+const usermodel = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 /**
- * -User registration controller nigga
- * 
+* -  user registration controller hai yeh yeahan se user register karaga
+* - POST /api/auth/register
 */
-async function UserRegisterController(req, res) {
+async function userRegistrationController(req, res) {
   try {
-    const { email, password, name } = req.body;
+    const { name, email, password } = req.body;
 
-    if (!email || !password || !name) {
+    if (!name || !email || !password) {
       return res.status(400).json({
-        message: "Email, password and name are required",
-        status: "failed",
+        success: false,
+        message: "Name, email, and password are required"
       });
     }
 
-    const ifExists = await userModel.findOne({ email });
-
+    const ifExists = await usermodel.findOne({ email });
     if (ifExists) {
-      return res.status(400).json({
-        message: "User already exists",
-        status: "failed",
+      return res.status(422).json({
+        success: false,
+        message: "User already exists"
       });
     }
 
-    const user = await userModel.create({
-      email,
-      password,
-      name,
+    const user = await usermodel.create({ name, email, password });
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d"
     });
 
-    const token = jwt.sign(
-      { userID: user.id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
-    res.cookie("token", token);
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "lax"
+    });
 
     return res.status(201).json({
+      message: "User registered successfully",
+      success: true,
       user: {
-        _id: user.id,
         name: user.name,
         email: user.email,
+        id: user._id
       },
-      token,
+      token
     });
   } catch (error) {
     return res.status(500).json({
-      message: error.message || "Internal server error",
-      status: "failed",
+      success: false,
+      message: "Failed to register user",
+      error: error.message
     });
   }
 }
 
-/** 
- * -User Login Controller
-*/
-async function UserLoginController(req,res){
-    const {email,password}=req.body;
-    const user = await userModel.findOne({email})
-    if(!user){
-        return res.status(401).json({
-            message:"User email/password is not valid"
-        })
-    }
-}
-
-module.exports = { UserRegisterController,UserLoginController};
+module.exports = {
+  userRegistrationController
+};

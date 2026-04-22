@@ -1,8 +1,5 @@
-this is basic code testing
+Basic auth backend (Express + MongoDB).
 
-app.listen(3000,()=>{
-    console.log("The server is running ")
-})
-
-
-password Jl4Wa1Pd73PmdJSo
+Run:
+- `npm install`
+- `npm run dev`
